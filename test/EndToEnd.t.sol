@@ -39,13 +39,11 @@ contract EndToEnd is Test {
         assertEq(ticketNFT.creator(), charlie);
         assertEq(ticketNFT.maxNumberOfTickets(), 100);
         assertEq(primaryMarket.getPrice(address(ticketNFT)), ticketPrice);
-
         vm.startPrank(alice);
         purchaseToken.mint{value: 1e18}();
         assertEq(purchaseToken.balanceOf(alice), 100e18);
         purchaseToken.approve(address(primaryMarket), 100e18);
         uint256 id = primaryMarket.purchase(address(ticketNFT), "Alice");
-
         assertEq(ticketNFT.balanceOf(alice), 1);
         assertEq(ticketNFT.holderOf(id), alice);
         assertEq(ticketNFT.holderNameOf(id), "Alice");
@@ -53,9 +51,10 @@ contract EndToEnd is Test {
         assertEq(purchaseToken.balanceOf(charlie), ticketPrice);
 
         ticketNFT.approve(address(secondaryMarket), id);
-        secondaryMarket.listTicket(address(ticketNFT), id, 150e18);
 
+        secondaryMarket.listTicket(address(ticketNFT), id, 150e18);
         assertEq(secondaryMarket.getHighestBid(address(ticketNFT), id), 150e18);
+        
         assertEq(
             secondaryMarket.getHighestBidder(address(ticketNFT), id),
             address(0)
@@ -88,11 +87,15 @@ contract EndToEnd is Test {
         assertEq(purchaseToken.balanceOf(address(secondaryMarket)), 0);
         uint256 fee = (bidPrice * 0.05e18) / 1e18;
         assertEq(purchaseToken.balanceOf(charlie), ticketPrice + fee);
+        
         assertEq(
             purchaseToken.balanceOf(alice),
             aliceBalanceBefore + bidPrice - fee
         );
+
         assertEq(ticketNFT.holderOf(id), bob);
         assertEq(ticketNFT.holderNameOf(id), "Bob");
+    
     }
 }
+
